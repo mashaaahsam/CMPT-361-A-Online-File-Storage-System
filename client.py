@@ -19,10 +19,10 @@ Returns:
 """
 def client():
     # Get the serverName from the user
-    serverName = input('Enter the server name or IP address: ') # localhost = '127.0.0.1' 
+    serverName = input('Enter the host name or IP: ') # localhost = '127.0.0.1' 
 
     # Server Information
-    serverPort = 13000
+    serverPort = 13001
 
     # Create client socket 
     try: 
@@ -40,6 +40,22 @@ def client():
 
          # Start Communication
         #--------------------------------------------------------
+        
+        while True:
+            # Message Length First
+            messageLen = int(clientSocket.recv(4).decode('ascii'))
+
+            # Accept a message with that message length
+            message = clientSocket.recv(messageLen).decode('acsii')
+
+            # The server has been terminated, disconnect
+            if message == 'exit':
+                print("Connection is Terminated")
+                break
+
+            else:
+                # User decides something based on the message from server
+                userChoice = input(message)
 
         # Stop Communication - Terminate connection with server
         #--------------------------------------------------------

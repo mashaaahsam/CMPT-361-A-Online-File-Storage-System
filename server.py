@@ -19,7 +19,7 @@ Returns:
 """
 def server():
     # Server Port
-    serverPort = 13000
+    serverPort = 13001
 
     # Create the same server socket as the client
     try:
@@ -46,6 +46,39 @@ def server():
 
             # Start Communication
             #--------------------------------------------------------
+            
+            #Check user
+            IsValid = checkUser(connectionSocket)
+            if not IsValid:
+                # Send exit message
+                exitMessage = 'exit'
+                connectionSocket.send('0004'.encode('ascii')) # Send length of message
+                connectionSocket.send(exitMessage.encode('ascii')) # Send exit message
+                connectionSocket.close()
+                break
+
+
+            # User is approved - Enter menu
+            serverMessage = ("\n\nPlease select the operation:\n"
+                       "1) View uploaded files' information\n2) Upload a file"
+                       "\n3) Terminate the connection\nChoice: ")
+            
+            # If the username is valid the server menu will show up
+            while IsValid:
+                # Get length of message with 4-figure 0 padding
+                length = str(len(serverMessage)).zfill(4)
+                connectionSocket.send(length.encode('ascii'))
+                # Send message
+                connectionSocket.send(serverMessage.encode('ascii'))
+
+                userChoice = (connectionSocket.recv(2048).decode('ascii')).strip()
+
+                if userChoice == '3':
+                    exitMessage = 'exit'
+                    connectionSocket.send('0004'.encode('ascii')) # Send length of message
+                    connectionSocket.send(exitMessage.encode('ascii')) # Send exit message
+                    connectionSocket.close()
+                    break
 
 
             # Stop Communication
@@ -69,6 +102,28 @@ Purpose:
 Parameters:
 Returns:
 """
+def checkUser(connectionSocket):
+    # Prepare message and send to user
+    checkMessage = "Welcome to our system.\nEnter your username: "
+    length = str(len(checkMessage)).zfill(4)
+    connectionSocket.send(length.encode('acsii'))
+    connectionSocket.send(checkMessage.encode('acsii'))
+
+    # Receive a reply
+    userInput = connectionSocket.recv(2048).decode('ascii').strip()
+
+    if userInput == 'user1':
+        return True
+    else:
+        return False
+
+
+"""
+Purpose:
+Parameters:
+Returns:
+"""
+
 
 
 ## Call the server function when program is run
