@@ -19,7 +19,7 @@ Returns:
 """
 def server():
     # Server Port
-    serverPort = 13001
+    serverPort = 13000
 
     # Create the same server socket as the client
     try:
@@ -42,7 +42,7 @@ def server():
         try:
             #Server Accepts Client Connection
             connectionSocket, addr = serverSocket.accept()
-            #! print('\n**Debugging:',addr, '   ', connectionSocket, 'DELETE!!\n') # prints the successful connection for the server side to see
+            print('\n**Debugging:',addr, '   ', connectionSocket, 'DELETE!!\n') # prints the successful connection for the server side to see
 
             # Start Communication
             #--------------------------------------------------------
@@ -54,8 +54,7 @@ def server():
                 exitMessage = 'exit'
                 connectionSocket.send('0004'.encode('ascii')) # Send length of message
                 connectionSocket.send(exitMessage.encode('ascii')) # Send exit message
-                connectionSocket.close()
-                break
+                connectionSocket.close() # close connection for that user
 
 
             # User is approved - Enter menu
@@ -106,8 +105,8 @@ def checkUser(connectionSocket):
     # Prepare message and send to user
     checkMessage = "Welcome to our system.\nEnter your username: "
     length = str(len(checkMessage)).zfill(4)
-    connectionSocket.send(length.encode('acsii'))
-    connectionSocket.send(checkMessage.encode('acsii'))
+    connectionSocket.send(length.encode('ascii'))
+    connectionSocket.send(checkMessage.encode('ascii'))
 
     # Receive a reply
     userInput = connectionSocket.recv(2048).decode('ascii').strip()
