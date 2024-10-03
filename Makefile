@@ -1,8 +1,10 @@
 # Makefile for CMPT 361 Assignment 1
 
-# Target to remove the PDF file
+# Target to remove any files that were sent over (leave the .py and .json)
 reset:
-	rm -f 'Server/file.pdf' 
+	rm -f Server/*.pdf
+	rm -f Server/*.txt
+	rm -f Server/*.jpeg
 
 # Target to run the client program
 client:
