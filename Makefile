@@ -2,11 +2,11 @@
 
 # Target to remove the PDF file
 reset:
-	rm -f 'Server/file.pdf - NEW' 
+	rm -f 'Server/file.pdf' 
 
 # Target to run the client program
 client:
-	python3 client.py
+	python3 Client/client.py
 
 # Target to run the server program & reset the environment for a new server
 server: reset

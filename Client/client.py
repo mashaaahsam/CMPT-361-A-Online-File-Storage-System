@@ -76,7 +76,7 @@ def client():
     except socket.error as e:
         print("An error occured:", e)
         clientSocket.close()
-        sys.close(1)
+        # sys.close(1)
     
 
 
@@ -99,8 +99,9 @@ def upload(clientSocket):
 
     # Try to find the file
     try:
-        # Get size in bytes of the file based on the user choice
-        sizeBytes = os.path.getsize(userChoice)
+        # Get size in bytes of the file based on the user choice (from Client directory)
+        filePath = os.path.join('Client', userChoice)
+        sizeBytes = os.path.getsize(filePath)
 
         fileInfo = f"{userChoice}  :::  {sizeBytes}"
 
@@ -113,7 +114,7 @@ def upload(clientSocket):
         print(message)
 
         # Open the file in binary mode to send the data
-        with open(userChoice, 'rb') as file:
+        with open(filePath, 'rb') as file:
             # Loop to send the file data in chunks
             while True:
                 # Read file data in chunks (1024 bytes at a time)
@@ -134,9 +135,11 @@ def upload(clientSocket):
     # Issues with the file
     except FileNotFoundError:
         print("File not found. Please check the file name and try again.")
+        clientSocket.close()
 
     except Exception as e:
         print(f"An error occurred: {e}")
+        clientSocket.close()
 
 
 
