@@ -3,7 +3,7 @@ Short version of desc.
 
 Detailed description...
 
-authour: Maryia Antoshkina
+authour: Maryia Antoshkina - 310...
 """
 
 # IMPORTS
@@ -11,6 +11,11 @@ import socket
 import sys
 import json
 import os
+from datetime import datetime
+
+
+# Path to the database file
+DATABASE_FILE = 'Server/Database.json'
 
 
 # FUNCTIONS
@@ -21,7 +26,7 @@ Returns:
 """
 def server():
     # Server Port
-    serverPort = 13000
+    serverPort = 13001
 
     # Create the same server socket as the client
     try:
@@ -44,7 +49,6 @@ def server():
         try:
             #Server Accepts Client Connection
             connectionSocket, addr = serverSocket.accept()
-            # print('\n**Debugging:',addr, '   ', connectionSocket, 'DELETE!!\n') # prints the successful connection for the server side to see
 
             # Start Communication
             #--------------------------------------------------------
@@ -67,8 +71,9 @@ def server():
 
                 userChoice = (connectionSocket.recv(2048).decode('ascii')).strip()
 
+                # View files
                 if userChoice == '1':
-                    pass
+                    view(connectionSocket)
                 
                 # File Upload
                 if userChoice == '2':
@@ -131,6 +136,9 @@ Returns:
 """
 def upload(connectionSocket):
     try:
+        # Create the database if not created
+        initializeDatabase()
+
         uploadMessage = "Please provide the file name: "
         length = str(len(uploadMessage)).zfill(4)
         # Send the length and upload message
@@ -141,7 +149,7 @@ def upload(connectionSocket):
         fileInfo = connectionSocket.recv(2048).decode('ascii')
 
         # Split the fileName and size
-        fileName, fileSize = fileInfo.split('  :::  ')
+        fileName, fileSize = fileInfo.split('\n')
         fileSize = int(fileSize)
 
         #!DEBUGGING
@@ -178,8 +186,8 @@ def upload(connectionSocket):
             connectionSocket.send(length.encode('ascii'))
             connectionSocket.send(receivedMessage.encode('ascii'))  
 
-            # Update the json file
-            update()
+            # Update the database with the new file information
+            update(fileName, fileSize)
 
         else:
             # send failure message
@@ -201,14 +209,53 @@ Purpose:
 Parameters:
 Returns:
 """
-def update():
-    pass
+def update(fileName, fileSize):
+    with open(DATABASE_FILE, 'r') as db_file:
+        database = json.load(db_file)
+    
+    # Get the current time
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
+    # Update the database with the new file info
+    database[fileName] = {
+        "size": str(fileSize),
+        "time": current_time
+    }
+
+    # Write the updated database back to the file
+    with open(DATABASE_FILE, 'w') as db_file:
+        json.dump(database, db_file, indent=4)
 
 """
 Purpose:
 Parameters:
 Returns:
 """
+def initializeDatabase():
+    if not os.path.exists(DATABASE_FILE):
+        with open(DATABASE_FILE, 'w') as db_file:
+            # Create an empty database
+            json.dump({}, db_file)
+    
+
+
+
+"""
+Purpose:
+Parameters:
+Returns:
+"""
+def view(connectionSocket):
+    # Read the data from the database json file and load the data
+    with open(DATABASE_FILE, 'r') as file:
+        dictionary = json.load(file)
+
+    dataStr = json.dumps(dictionary)
+    length = str(len(dataStr)).zfill(4)
+    connectionSocket.send(length.encode('ascii'))
+    connectionSocket.send(dataStr.encode('ascii'))
+
+    
 
 
 
