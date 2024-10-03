@@ -6,10 +6,12 @@ Detailed description...
 authour: Maryia Antoshkina
 """
 
+
 # IMPORTS
 import socket
 import sys
 import os
+import json
 
 
 # FUNCTIONS
@@ -20,10 +22,10 @@ Returns:
 """
 def client():
     # Get the serverName from the user
-    serverName = input('Enter the host name or IP: ') # localhost = '127.0.0.1' 
+    serverName = input('Enter the host name or IP: ') # cc5-212-05.macewan.ca or cc5-212-06.macewan.ca 
 
     # Server Information
-    serverPort = 13000
+    serverPort = 13001
 
     # Create client socket 
     try: 
@@ -68,6 +70,9 @@ def client():
                 # Check if user wanted to upload a file, if so go to upload menu
                 if userChoice.strip() == '2':
                     upload(clientSocket)
+                
+                if userChoice.strip() == '1':
+                    view(clientSocket)
 
         # Stop Communication - Terminate connection with server
         #--------------------------------------------------------
@@ -103,7 +108,7 @@ def upload(clientSocket):
         filePath = os.path.join('Client', userChoice)
         sizeBytes = os.path.getsize(filePath)
 
-        fileInfo = f"{userChoice}  :::  {sizeBytes}"
+        fileInfo = f"{userChoice}\n{sizeBytes}"
 
         # Send userchoice + size of file to the server
         clientSocket.send(fileInfo.encode('ascii'))
@@ -141,6 +146,33 @@ def upload(clientSocket):
         print(f"An error occurred: {e}")
         clientSocket.close()
 
+
+"""
+Purpose:
+Parameters:
+Returns:
+"""
+def view(clientSocket):
+    length = int(clientSocket.recv(4).decode('ascii'))
+    recvData = clientSocket.recv(length).decode('ascii')
+
+    try:
+        # Deserialize the received string into a dictionary
+        file_data = json.loads(recvData)
+        
+        # Print the header
+        print("\nName\t\tSize (Bytes)\tUpload Date and Time")
+
+        # Loop through the dictionary and print each file's details
+        for file_name, info in file_data.items():
+            file_size = info['size']
+            upload_time = info['time']
+            
+            # Print the file information
+            print(f"{file_name.ljust(15)}{file_size.ljust(15)}\t{upload_time}")
+
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
 
 
 
