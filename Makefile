@@ -2,12 +2,12 @@
 
 # Target to remove the PDF file
 reset:
-	rm -f 'CMPT 361 Assignment 1.pdf - NEW'
+	rm -f 'Server/file.pdf - NEW' 
 
 # Target to run the client program
 client:
 	python3 client.py
 
-# Target to run the server program
-server:
-	python3 server.py
+# Target to run the server program & reset the environment for a new server
+server: reset
+	python3 Server/server.py

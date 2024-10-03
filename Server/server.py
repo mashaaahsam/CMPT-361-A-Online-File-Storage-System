@@ -10,6 +10,7 @@ authour: Maryia Antoshkina
 import socket
 import sys
 import json
+import os
 
 
 # FUNCTIONS
@@ -167,8 +168,7 @@ def upload(connectionSocket):
         # Done receiving -> wb into a json file
         # Check that it's not empty
         if receivedData:
-            newName = f'{fileName} - NEW'
-            # Save the file to the server's directory
+            newName = os.path.join('Server', f'{fileName} - NEW')            # Save the file to the server's directory
             with open(newName, 'wb') as file:
                 file.write(receivedData)
 
